@@ -1138,6 +1138,46 @@ describe('InputNumber', () => {
     });
   });
 
+  // precision: 0 ~ 20
+  it('should use correct precision when out of bounds', () => {
+    const MAX_BOUND = 20;
+    const MIN_BOUND = 0;
+
+    class Demo extends React.Component {
+      state = {
+        precision: MAX_BOUND - 2, // In bound(value: MAX_BOUND - 2)
+      };
+      onPrecisionChange = (precision) => {
+        this.setState({ precision });
+      };
+      render() {
+        const { precision } = this.state;
+        return (
+          <div>
+            <InputNumber onChange={this.onPrecisionChange} />
+            <InputNumber precision={precision} defaultValue={1.25} />
+          </div>
+        );
+      }
+    }
+    example = ReactDOM.render(<Demo />, container);
+    const [precisionInput, numberInput] = scryRenderedDOMComponentsWithTag(example, 'input');
+    expect(numberInput.value).to.be('1.250000000000000000');
+
+    // Test > max
+    Simulate.focus(precisionInput);
+    Simulate.change(precisionInput, { target: { value: '22' } }); // MAX_BOUND + 2
+    Simulate.blur(precisionInput);
+    expect(numberInput.value).to.be('1.25000000000000000000');
+
+    // Test < min
+    Simulate.focus(precisionInput);
+    // MIN_BOUND - 1, real: Math.abs(MIN_BOUND - 1)
+    Simulate.change(precisionInput, { target: { value: '-1' } });
+    Simulate.blur(precisionInput);
+    expect(numberInput.value).to.be('1.3'); // 1.25.toFixed(1) = 1.3
+  });
+
   describe(`required prop`, () => {
     it(`should add required attr to the input tag when get passed as true`, () => {
       ReactDOM.render(<InputNumber id="required-input-test" required />, container);
