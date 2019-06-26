@@ -47,7 +47,8 @@
     "test": "rc-test run test",
     "saucelabs": "rc-test run saucelabs",
     "chrome-test": "rc-test run chrome-test",
-    "coverage": "rc-test run coverage"
+    "coverage": "rc-test run coverage",
+    "prepare": "npm run compile && npm run dist"
   },
   "devDependencies": {
     "core-js": "^2.5.1",
